@@ -53,7 +53,7 @@ const GLM_MODELS = [
   "google/gemma-3-27b-it:free",
 ];
 
-const SYSTEM_CODING = `Kamu adalah AIVA, asisten AI yang cerdas dan helpful.
+const SYSTEM_CODING = `Kamu adalah GRY AI, asisten AI yang cerdas dan helpful.
 
 ATURAN WAJIB — TIDAK BOLEH DILANGGAR:
 - SELALU selesaikan jawaban sampai tuntas. JANGAN berhenti di tengah kalimat atau kode.
