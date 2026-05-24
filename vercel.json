@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "buildCommand": "",
+  "outputDirectory": ".",
+  "rewrites": [
+    { "source": "/api/chat", "destination": "/api/chat" },
+    { "source": "/api/multi-chat", "destination": "/api/multi-chat" },
+    { "source": "/api/status", "destination": "/api/status" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
