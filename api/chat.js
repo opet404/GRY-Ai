@@ -14,8 +14,8 @@ module.exports = async function handler(req, res) {
 
     const trimmedHistory = Array.isArray(history) ? history.slice(-6) : [];
 
-    // TIDAK ada timeout manual — biarkan Vercel yang handle.
-    // Ini penting supaya pertanyaan coding/berpikir lama tetap bisa dijawab.
+    // callAPI sudah punya fallback chain panjang — jika satu model rate limit,
+    // otomatis pindah ke model berikutnya tanpa perlu restart dari frontend.
     const reply = await callAPI(api, message, trimmedHistory);
     return res.status(200).json({ reply });
 
@@ -24,12 +24,12 @@ module.exports = async function handler(req, res) {
     const msg = err.message || "";
 
     let errMsg;
-    if (msg.includes("429")) {
-      errMsg = "⚠️ Model sedang ramai (rate limit). Coba lagi dalam 10-30 detik, atau ganti model lain.";
+    if (msg.includes("429") || msg.includes("rate") || msg.includes("quota")) {
+      errMsg = "⚠️ Semua model sedang penuh (rate limit). Coba lagi dalam 30 detik.";
     } else if (msg.includes("503") || msg.includes("502")) {
-      errMsg = "⚠️ Server model sedang down. Coba ganti model lain.";
+      errMsg = "⚠️ Server model sedang down. Coba lagi sebentar.";
     } else if (msg.includes("AbortError") || msg.includes("Timeout")) {
-      errMsg = "⏱️ Model terlalu lama merespons. Coba lagi atau ganti model.";
+      errMsg = "⏱️ Model terlalu lama merespons. Coba lagi atau pilih model lain.";
     } else {
       errMsg = "❌ Error: " + msg;
     }

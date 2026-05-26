@@ -19,15 +19,21 @@ module.exports = async function handler(req, res) {
     // History dari frontend (dikelola di localStorage per sesi)
     const trimmedHistory = Array.isArray(history) ? history.slice(-12) : [];
 
+    // Jalankan semua model paralel — masing-masing punya fallback chain sendiri
+    // Jika model X rate limit, dia otomatis fallback ke model X+1 di _lib.js
     const results = await Promise.allSettled(
       allModels.map(api => callAPI(api, message, trimmedHistory))
     );
 
     const replies = {};
     allModels.forEach((api, i) => {
-      replies[api] = results[i].status === "fulfilled"
-        ? results[i].value
-        : `Gagal: ${results[i].reason?.message || "unknown error"}`;
+      if (results[i].status === "fulfilled") {
+        replies[api] = results[i].value;
+      } else {
+        const errMsg = results[i].reason?.message || "unknown error";
+        console.error(`[MULTI] ${api} gagal:`, errMsg);
+        replies[api] = `Gagal: ${errMsg}`;
+      }
     });
 
     return res.status(200).json({ replies });
